@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.UserRepository;
 
+//tìm kiếm một đối tượng User dựa trên tên đăng nhập. 
+//Nếu tìm thấy, nó sẽ trả về một đối tượng UserDetailsImpl được tạo từ đối tượng User này.
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
   @Autowired

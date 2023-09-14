@@ -21,7 +21,7 @@ import com.toan.spring.project.services.UserService;
 
 @RestController
 @RequestMapping("/api")
-public class BorrowingController {
+public class BorrowController {
     @Autowired
     private BorrowingDetailService borrowingDetailService;
     @Autowired

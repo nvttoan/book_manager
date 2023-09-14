@@ -32,6 +32,7 @@ public class JwtUtils {
   @Value("${toan.app.jwtCookieName}")
   private String jwtCookie;
 
+  // lấy jwt từ request
   public String getJwtFromCookies(HttpServletRequest request) {
     Cookie cookie = WebUtils.getCookie(request, jwtCookie);
     if (cookie != null) {
@@ -41,6 +42,8 @@ public class JwtUtils {
     }
   }
 
+  // tạo một chuỗi JWT từ UserDetailsImpl của người dùng, sau đó chèn chuỗi này
+  // vào một cookie HTTP và trả về cookie để gửi về phía người dùng.
   public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
     String jwt = generateTokenFromUsername(userPrincipal.getUsername());
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true)
@@ -48,6 +51,7 @@ public class JwtUtils {
     return cookie;
   }
 
+  // gỡ cookie
   public ResponseCookie getCleanJwtCookie() {
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
     return cookie;
@@ -62,6 +66,7 @@ public class JwtUtils {
     return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
   }
 
+  // xác thực jwt
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
@@ -79,6 +84,7 @@ public class JwtUtils {
     return false;
   }
 
+  // build jwt từ username and
   public String generateTokenFromUsername(String username) {
     return Jwts.builder()
         .setSubject(username)

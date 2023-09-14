@@ -8,9 +8,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
+import com.toan.spring.project.aspects.BookActivityLoggingAspect;
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
+import com.toan.spring.project.models.BookActivityLog;
 import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
 
@@ -20,6 +22,8 @@ import com.toan.spring.project.services.BookService;
 public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private BookActivityLoggingAspect bookActivityLog;
 
     @Override
     @Cacheable("books")
@@ -46,7 +50,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book addNewBook(Book book) {
-        return save(book);
+        Book savedBook = save(book); // Lưu sách vào cơ sở dữ liệu
+        bookActivityLog.logActivity("Create", savedBook.getId()); // Sử dụng ID của sách sau khi đã lưu
+        return savedBook;
     }
 
     @Override

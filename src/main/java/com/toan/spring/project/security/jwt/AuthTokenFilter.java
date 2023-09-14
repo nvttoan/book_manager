@@ -27,16 +27,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
+  // xác thực và ủy quyền người dùng
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     try {
+      // Sử dụng phương thức parseJwt (đã được triển khai trước đó) để lấy chuỗi JWT
+      // từ đối tượng HttpServletRequest.
       String jwt = parseJwt(request);
       if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
         String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
+        // validate jwt và lấy username
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
+        // sử dụng đối tượng UserDetailsService để lấy thông tin chi tiết người dùng và
+        // tạo một đối tượng UsernamePasswordAuthenticationToken để xác thực người dùng.
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
             null,
             userDetails.getAuthorities());
@@ -52,6 +56,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
+  // nhận jwt từ request(HttpServletRequest),phân tích và trả về chuỗi đó
   private String parseJwt(HttpServletRequest request) {
     String jwt = jwtUtils.getJwtFromCookies(request);
     return jwt;

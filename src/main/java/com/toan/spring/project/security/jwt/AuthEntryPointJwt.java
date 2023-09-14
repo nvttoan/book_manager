@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//lỗi 401
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 

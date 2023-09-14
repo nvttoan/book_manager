@@ -77,6 +77,7 @@ public class AuthController {
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    // validate
     if (containsUpperCase(signUpRequest.getUsername()) || containsSpecialCharacters(signUpRequest.getPassword())) {
       return ResponseEntity.badRequest().body(new MessageResponse(
           "Error: Username and password must not contain uppercase letters or special characters!"));

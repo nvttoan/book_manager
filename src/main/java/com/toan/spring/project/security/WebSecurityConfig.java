@@ -22,29 +22,22 @@ import com.toan.spring.project.security.jwt.AuthTokenFilter;
 import com.toan.spring.project.security.services.UserDetailsServiceImpl;
 
 @Configuration
-// @EnableWebSecurity
 @EnableMethodSecurity
-// (securedEnabled = true,
-// jsr250Enabled = true,
-// prePostEnabled = true) // by default
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+
+public class WebSecurityConfig {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
-
+  // dung entrypoint xu ly exception
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
 
+  // gọi lại lớp filter xác thực token jwt
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
     return new AuthTokenFilter();
   }
 
-  // @Override
-  // public void configure(AuthenticationManagerBuilder
-  // authenticationManagerBuilder) throws Exception {
-  // authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-  // }
-
+  // daoauthen xác thực thông tin ng dùng đăng nhập
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -55,12 +48,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return authProvider;
   }
 
-  // @Bean
-  // @Override
-  // public AuthenticationManager authenticationManagerBean() throws Exception {
-  // return super.authenticationManagerBean();
-  // }
-
+  // xác thực ng dùng các phần ko đăng nhập
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
     return authConfig.getAuthenticationManager();
@@ -71,19 +59,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  // @Override
-  // protected void configure(HttpSecurity http) throws Exception {
-  // http.cors().and().csrf().disable()
-  // .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-  // .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-  // .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-  // .antMatchers("/api/test/**").permitAll()
-  // .anyRequest().authenticated();
-  //
-  // http.addFilterBefore(authenticationJwtTokenFilter(),
-  // UsernamePasswordAuthenticationFilter.class);
-  // }
-
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
@@ -91,7 +66,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/allbooks/**").permitAll()
-            .requestMatchers("/v3/api-docs**").permitAll()
+            .requestMatchers("/v3/api-docs/**").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());

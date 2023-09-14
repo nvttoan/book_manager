@@ -144,4 +144,17 @@ public class UserService {
             e.printStackTrace();
         }
     }
+
+    public void changeUserRoleToBanned(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        Set<Role> newRoles = new HashSet<>();
+        Role bannedRole = roleRepository.findByName("ROLE_BANNED")
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: ROLE_BANNED"));
+        newRoles.add(bannedRole);
+
+        user.setRoles(newRoles);
+        userRepository.save(user);
+    }
 }
