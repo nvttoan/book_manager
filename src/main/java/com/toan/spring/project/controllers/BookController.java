@@ -60,7 +60,7 @@ public class BookController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền xóa sách"));
         } catch (Exception e) {
-            return ResponseEntity.ok(new MessageResponse("Error: Có lỗi"));
+            return ResponseEntity.ok(new MessageResponse("Error: Có lỗi khi xóa"));
         }
 
     }

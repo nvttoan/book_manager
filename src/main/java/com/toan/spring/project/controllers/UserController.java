@@ -69,7 +69,7 @@ public class UserController {
 
             return ResponseEntity.ok("Đã cấm người dùng thành công.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền cấm người dùng"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Cấm người dùng thất bại"));
         }
 
     }

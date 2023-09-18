@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,18 +32,21 @@ public class BorrowingDetail {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
-
+    // khóa ngoại là bảng book và user
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "borrow_time", nullable = false)
+    @NotNull
+    @Column(name = "borrow_time")
     private long borrowTime;
 
-    @Column(name = "expected_return_time", nullable = false)
+    @NotNull
+    @Column(name = "expected_return_time")
     private long expectedReturnTime;
 
-    @Column(name = "penalty", nullable = false)
+    @NotNull
+    @Column(name = "penalty")
     private long penalty;
 
     @Enumerated(EnumType.STRING)

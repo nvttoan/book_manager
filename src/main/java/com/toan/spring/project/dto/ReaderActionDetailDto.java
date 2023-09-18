@@ -18,9 +18,11 @@ public class ReaderActionDetailDto {
 
     public ReaderActionDetailDto(BorrowingDetail detail, ReaderAction readerAction) {
         this.readerAction = readerAction;
-        this.time = new Date((readerAction == ReaderAction.BORROW
-                ? detail.getBorrowTime()
-                : detail.getExpectedReturnTime() + detail.getPenalty()));
+        if (readerAction == ReaderAction.BORROW) {
+            this.time = new Date(detail.getBorrowTime());
+        } else {
+            this.time = new Date(detail.getExpectedReturnTime() + detail.getPenalty() * 24 * 60 * 60);
+        }
         this.user = detail.getUser().getUsername();
         this.name = detail.getUser().getName();
     }
