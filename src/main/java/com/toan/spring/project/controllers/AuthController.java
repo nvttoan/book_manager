@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toan.spring.project.dto.ApiResponseDto;
+import com.toan.spring.project.dto.LoginResponseDto;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.request.LoginRequest;
@@ -74,7 +74,7 @@ public class AuthController {
           .collect(Collectors.toList());
 
       // gắn jwt vào header
-      ApiResponseDto response = new ApiResponseDto("Đăng nhập thành công với thông tin sau:", new UserInfoResponse(
+      LoginResponseDto response = new LoginResponseDto("Đăng nhập thành công với thông tin sau:", new UserInfoResponse(
           userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getName(), roles));
 
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
