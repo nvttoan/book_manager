@@ -12,13 +12,16 @@ import com.toan.spring.project.models.BorrowingDetail;
 @AllArgsConstructor
 public class BorrowingDetailDto {
     private String book;
+    private String author;
     private String user;
     private Date borrowTime;
     private Date expectedReturnTime;
     private long penalty;
 
+    // constructor tạo dto từ detail
     public BorrowingDetailDto(BorrowingDetail borrowingDetail) {
         this.book = borrowingDetail.getBook().getTitle();
+        this.author = borrowingDetail.getBook().getAuthor();
         this.user = borrowingDetail.getUser().getName();
         this.borrowTime = new Date(borrowingDetail.getBorrowTime());
         this.expectedReturnTime = new Date(borrowingDetail.getExpectedReturnTime());

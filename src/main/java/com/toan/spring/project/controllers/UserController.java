@@ -4,14 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import com.toan.spring.project.dto.BorrowingDetailDto;
-import com.toan.spring.project.dto.CheckoutDetailDto;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.services.UserService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

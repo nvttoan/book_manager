@@ -15,6 +15,7 @@ import com.toan.spring.project.models.BorrowingDetail;
 @AllArgsConstructor
 public class CheckoutDetailDto {
     private String book;
+    private String author;
     private String user;
     private String name;
     private Date borrowTime;
@@ -25,13 +26,18 @@ public class CheckoutDetailDto {
 
     public CheckoutDetailDto(BorrowingDetail borrowingDetail, long returnTime) {
         this.book = borrowingDetail.getBook().getTitle();
+        this.author = borrowingDetail.getBook().getAuthor();
         this.user = borrowingDetail.getUser().getUsername();
         this.name = borrowingDetail.getUser().getName();
         this.borrowTime = new Date(borrowingDetail.getBorrowTime());
         this.expectedReturnTime = new Date(borrowingDetail.getExpectedReturnTime());
         this.returnTime = new Date(returnTime);
         this.penaltyDuration = returnTime - expectedReturnTime.getTime();
-        this.penalty = (int) (borrowingDetail.getPenalty() > 0 ? borrowingDetail.getPenalty() : 0);
-        // / (24 * 60 * 60 * 1000) * 1000;
+        if (borrowingDetail.getPenalty() > 0) {
+            this.penalty = (int) borrowingDetail.getPenalty();
+        } else {
+            this.penalty = 0;
+        }
+
     }
 }

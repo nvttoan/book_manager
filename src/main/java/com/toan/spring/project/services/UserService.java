@@ -29,132 +29,25 @@ import java.util.Set;
 @Service
 @EnableCaching
 
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private BookService bookService;
+public interface UserService {
+    public List<User> getAllUser();
 
-    @Autowired
-    private BorrowingDetailService borrowingDetailService;
+    public User createUser(User user);
 
-    // @Cacheable("users")
-    public List<User> getAllUser() {
-        return userRepository.findAll();
-    }
+    public User getUserById(long id);
 
-    public User createUser(User user) {
-        // kiểm tra xem tên người dùng hoặc email đã tồn tại trong repository
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new ResourceNotFoundException("Username already exists: " + user.getUsername());
-        }
+    public User updateUser(long id, User userDetails);
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ResourceNotFoundException("Email already exists: " + user.getEmail());
-        }
+    public void deleteUser(long id);
 
-        // mã hóa password BCryptPasswordEncoder
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+    public List<User> getUsersByRoleId(Long roleId);
 
-        Set<Role> roles = user.getRoles();
-        if (roles != null && !roles.isEmpty()) {
-            Set<Role> assignedRoles = new HashSet<>();
-            for (Role role : roles) {
-                Role existingRole = roleRepository.findByName(role.getName())
-                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role.getName()));
-                assignedRoles.add(existingRole);
-            }
-            user.setRoles(assignedRoles);
-        } else {
-            throw new IllegalArgumentException("User must have at least one role.");
-        }
+    // // borrow
+    // public BorrowingDetailDto borrowBook(Long userid, Long bookid, long
+    // expectedReturn);
 
-        return userRepository.save(user);
-    }
+    // // return
+    // public CheckoutDetailDto returnBook(Long userid, Long bookid);
 
-    // @CacheEvict(value = "user", key = "#user.id")
-    public User getUserById(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("user not exit with id:" + id));
-    }
-
-    public User updateUser(long id, User userDetails) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-
-        user.setUsername(userDetails.getUsername());
-        user.setEmail(userDetails.getEmail());
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(userDetails.getPassword());
-        user.setPassword(encodedPassword);
-
-        Set<Role> roles = userDetails.getRoles();
-        if (roles != null) {
-            // Lấy danh sách vai trò từ cơ sở dữ liệu dựa trên tên vai trò
-            Set<Role> updatedRoles = new HashSet<>();
-            for (Role role : roles) {
-                Role existingRole = roleRepository.findByName(role.getName())
-                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role.getName()));
-                updatedRoles.add(existingRole);
-            }
-
-            user.setRoles(updatedRoles);
-        }
-
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("user not delete with id:" + id));
-        userRepository.delete(user);
-    }
-
-    public List<User> getUsersByRoleId(Long roleId) {
-        return userRepository.findUsersByRoleId(roleId);
-    }
-
-    // borrow
-    public BorrowingDetailDto borrowBook(Long userid, Long bookid, long expectedReturn) {
-        User user = userRepository.findById(userid)
-                .orElseThrow(() -> new ResourceNotFoundException("Unavailable user"));
-        Book book = bookService.findById(bookid);
-        BorrowingDetail borrowingDetail = borrowingDetailService.createNewBorrowDetail(user, book, expectedReturn);
-        if (book.getStatus() == BookStatus.AVAILABLE) {
-            book.setStatus(BookStatus.NOT_AVAILABLE);
-            bookService.save(book);
-        }
-        return new BorrowingDetailDto(borrowingDetail);
-    }
-
-    // return
-    public CheckoutDetailDto returnBook(Long userid, Long bookid) {
-        BorrowingDetail borrowingDetail = borrowingDetailService.checkOutBorrowDetail(userid, bookid);
-        return new CheckoutDetailDto(borrowingDetail, System.currentTimeMillis());
-    }
-
-    private void doLongRunningTask() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void changeUserRoleToBanned(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        Set<Role> newRoles = new HashSet<>();
-        Role bannedRole = roleRepository.findByName("ROLE_BANNED")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found: ROLE_BANNED"));
-        newRoles.add(bannedRole);
-
-        user.setRoles(newRoles);
-        userRepository.save(user);
-    }
+    public void changeUserRoleToBanned(long userId);
 }

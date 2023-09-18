@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toan.spring.project.models.BookActivityLog;
-import com.toan.spring.project.repository.BookActivityLogRepository;
 import com.toan.spring.project.services.BookActivityLogService;
 
 @RestController

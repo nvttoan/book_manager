@@ -24,15 +24,13 @@ import com.toan.spring.project.services.UserService;
 public class BorrowController {
     @Autowired
     private BorrowingDetailService borrowingDetailService;
-    @Autowired
-    private UserService userService;
 
-    // 7 ngày
+    // 7 ngày trả sách
     @PostMapping("/user/borrow")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> borrowBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
-        BorrowingDetailDto borrowingDetailDto = userService.borrowBook(userid, bookid,
+        BorrowingDetailDto borrowingDetailDto = borrowingDetailService.borrowBook(userid, bookid,
                 System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000));
         return ResponseEntity.ok(borrowingDetailDto);
     }
@@ -41,7 +39,7 @@ public class BorrowController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> returnBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
-        CheckoutDetailDto checkoutDetailDto = userService.returnBook(userid, bookid);
+        CheckoutDetailDto checkoutDetailDto = borrowingDetailService.returnBook(userid, bookid);
         return ResponseEntity.ok(checkoutDetailDto);
     }
 

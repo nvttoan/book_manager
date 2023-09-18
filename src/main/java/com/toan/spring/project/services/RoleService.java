@@ -49,14 +49,4 @@ public class RoleService {
         roleRepository.deleteById(id);
     }
 
-    // phân trang
-    public Page<Role> getPaginatedRoles(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return roleRepository.findAll(pageable);
-    }
-
-    // // search
-    // public List<Role> findByNameOrCode(String name, String code) {
-    // return roleRepository.findByNameOrCode(name, code);
-    // }
 }

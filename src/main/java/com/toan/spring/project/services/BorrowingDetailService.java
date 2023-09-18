@@ -2,6 +2,8 @@ package com.toan.spring.project.services;
 
 import java.util.List;
 
+import com.toan.spring.project.dto.BorrowingDetailDto;
+import com.toan.spring.project.dto.CheckoutDetailDto;
 import com.toan.spring.project.dto.ReaderActionDetailDto;
 import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.BorrowingDetail;
@@ -17,6 +19,12 @@ public interface BorrowingDetailService {
     public BorrowingDetail findFirstInQueue(Long bookId);
 
     public BorrowingDetail save(BorrowingDetail borrowingDetail);
+
+    // borrow
+    public BorrowingDetailDto borrowBook(Long userid, Long bookid, long expectedReturn);
+
+    // return
+    public CheckoutDetailDto returnBook(Long userid, Long bookid);
 
     public List<ReaderActionDetailDto> readerActionDetails();
 
