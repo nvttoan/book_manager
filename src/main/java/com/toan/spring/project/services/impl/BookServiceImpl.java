@@ -12,7 +12,6 @@ import com.toan.spring.project.aspects.BookActivityLoggingAspect;
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
-import com.toan.spring.project.models.BookActivityLog;
 import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
 
@@ -43,7 +42,6 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    // @CacheEvict(value = "book", key = "#book.id")
     public void deleteBook(Book book) {
         bookRepository.delete(book);
     }

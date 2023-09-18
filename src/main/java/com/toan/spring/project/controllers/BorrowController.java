@@ -30,17 +30,27 @@ public class BorrowController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> borrowBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
-        BorrowingDetailDto borrowingDetailDto = borrowingDetailService.borrowBook(userid, bookid,
-                System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000));
-        return ResponseEntity.ok(borrowingDetailDto);
+        try {
+            BorrowingDetailDto borrowingDetailDto = borrowingDetailService.borrowBook(userid, bookid,
+                    System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000));
+            return ResponseEntity.ok(borrowingDetailDto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Sách không có hoặc người dùng bị cấm"));
+        }
+
     }
 
     @PostMapping("/user/return")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> returnBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
-        CheckoutDetailDto checkoutDetailDto = borrowingDetailService.returnBook(userid, bookid);
-        return ResponseEntity.ok(checkoutDetailDto);
+        try {
+            CheckoutDetailDto checkoutDetailDto = borrowingDetailService.returnBook(userid, bookid);
+            return ResponseEntity.ok(checkoutDetailDto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Trả sai sách hoặc bạn chưa mượn"));
+        }
+
     }
 
     @GetMapping("/admin/listborrowdetails")

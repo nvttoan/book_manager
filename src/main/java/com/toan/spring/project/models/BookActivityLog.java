@@ -22,6 +22,6 @@ public class BookActivityLog {
     private Long id;
 
     private String activity; // Create, Update, Delete
-    private Long bookId;
+    private Long bookUserId;
     private LocalDateTime timestamp;
 }

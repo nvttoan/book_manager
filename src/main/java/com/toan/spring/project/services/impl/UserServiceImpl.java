@@ -112,16 +112,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeUserRoleToBanned(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+    public void changeUserRoleToBanned(long id) {
+        User user = getUserById(id);
 
         Set<Role> newRoles = new HashSet<>();
-        Role bannedRole = roleRepository.findByName("ROLE_BANNED")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found: ROLE_BANNED"));
-        newRoles.add(bannedRole);
-
+        newRoles.add(new Role("ROLE_USER_BANNED"));
         user.setRoles(newRoles);
-        userRepository.save(user);
+
+        updateUser(id, user);
     }
 }

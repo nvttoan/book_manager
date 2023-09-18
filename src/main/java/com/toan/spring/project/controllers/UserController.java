@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
+import com.toan.spring.project.payload.response.MessageResponse;
 import com.toan.spring.project.services.UserService;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class UserController {
 
     @GetMapping("/user/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<User> getUserById(@PathVariable long id) {
+    public ResponseEntity<?> getUserById(@PathVariable long id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
@@ -62,18 +63,15 @@ public class UserController {
 
     @PutMapping("/user/banned/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> changeUserRoleToBanned(@PathVariable long id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<?> changeUserRoleToBanned(@PathVariable long id) {
+        try {
+            userService.changeUserRoleToBanned(id);
 
-        Set<Role> newRoles = new HashSet<>();
-        newRoles.add(new Role("ROLE_USER_BANNED")); // Đảm bảo bạn đã định nghĩa Role class hoặc tương tự
+            return ResponseEntity.ok("Đã cấm người dùng thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền cấm người dùng"));
+        }
 
-        // Sử dụng phương thức setRoles để đặt roles mới cho người dùng
-        user.setRoles(newRoles);
-
-        userService.updateUser(id, user);
-
-        return ResponseEntity.ok("Đã cấm người dùng thành công.");
     }
 
     @GetMapping("/user/role/{roleId}")

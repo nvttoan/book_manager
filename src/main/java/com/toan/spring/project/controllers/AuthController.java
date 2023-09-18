@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.toan.spring.project.dto.ApiResponseDto;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.request.LoginRequest;
@@ -72,72 +73,85 @@ public class AuthController {
           .map(item -> item.getAuthority())
           .collect(Collectors.toList());
 
-      return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-          .body(new UserInfoResponse(userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(),
-              userDetails.getName(), roles));
+      // gắn jwt vào header
+      ApiResponseDto response = new ApiResponseDto("Đăng nhập thành công với thông tin sau:", new UserInfoResponse(
+          userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getName(), roles));
+
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+          .body(response);
     } catch (BadCredentialsException e) {
       // 401
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tên đăng nhập hoặc mật khẩu");
+      return ResponseEntity.ok(new MessageResponse("Error: Sai username hoặc password"));
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("có lỗi");
+      return ResponseEntity.ok(new MessageResponse("Error: Đăng nhập thất bại"));
     }
   }
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-    // validate
-    if (containsUpperCase(signUpRequest.getUsername()) || containsSpecialCharacters(signUpRequest.getPassword())) {
-      return ResponseEntity.badRequest().body(new MessageResponse(
-          "Error: Username and password must not contain uppercase letters or special characters!"));
+    try {// validate
+      if (containsUpperCase(signUpRequest.getUsername()) || containsSpecialCharacters(signUpRequest.getPassword())) {
+        return ResponseEntity.badRequest().body(new MessageResponse(
+            "Error: Username và password không viết hoa hoặc chứa kí tự đặc biệt"));
+      }
+      if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        return ResponseEntity.badRequest().body(new MessageResponse("Error: Username đã được sử dụng"));
+      }
+
+      if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        return ResponseEntity.badRequest().body(new MessageResponse("Error: Email đã được sử dụng"));
+      }
+
+      // Create new user's account
+      User user = new User(signUpRequest.getUsername(),
+          signUpRequest.getEmail(), signUpRequest.getName(),
+          encoder.encode(signUpRequest.getPassword()));
+
+      Set<String> strRoles = signUpRequest.getRole();
+      Set<Role> roles = new HashSet<>();
+
+      if (strRoles == null) {
+        Role userRole = roleRepository.findByName("ROLE_USER")
+            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
+      } else {
+        strRoles.forEach(role -> {
+          switch (role) {
+            case "admin":
+              Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                  .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+              roles.add(adminRole);
+
+              break;
+            default:
+              Role userRole = roleRepository.findByName("ROLE_USER")
+                  .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+              roles.add(userRole);
+          }
+        });
+      }
+
+      user.setRoles(roles);
+      userRepository.save(user);
+
+      return ResponseEntity.ok(new MessageResponse("Đăng kí thành công"));
+    } catch (Exception e) {
+      return ResponseEntity.ok(new MessageResponse("Đăng kí thất bại"));
     }
-    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-    }
 
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-    }
-
-    // Create new user's account
-    User user = new User(signUpRequest.getUsername(),
-        signUpRequest.getEmail(), signUpRequest.getName(),
-        encoder.encode(signUpRequest.getPassword()));
-
-    Set<String> strRoles = signUpRequest.getRole();
-    Set<Role> roles = new HashSet<>();
-
-    if (strRoles == null) {
-      Role userRole = roleRepository.findByName("ROLE_USER")
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-      roles.add(userRole);
-    } else {
-      strRoles.forEach(role -> {
-        switch (role) {
-          case "admin":
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(adminRole);
-
-            break;
-          default:
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        }
-      });
-    }
-
-    user.setRoles(roles);
-    userRepository.save(user);
-
-    return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
 
   @PostMapping("/signout")
   public ResponseEntity<?> logoutUser() {
-    ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MessageResponse("You've been signed out!"));
+    try {
+      ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+      return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+          .body(new MessageResponse("Bạn đã đăng xuất!"));
+    } catch (Exception e) {
+      return ResponseEntity.ok(new MessageResponse("Error: Đăng xuất thất bại"));
+    }
+
   }
 
   // Hàm kiểm tra xem một chuỗi có chứa chữ hoa không

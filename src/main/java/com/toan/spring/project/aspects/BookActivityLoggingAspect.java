@@ -38,17 +38,15 @@ public class BookActivityLoggingAspect {
         logActivity("Delete", book.getId());
     }
 
-    // @Before("execution(*
-    // com.toan.spring.project.services.UserController.changeUserRoleToBanned(..))
-    // && args(userId)")
-    // public void logUserBanned(long userId) {
-    // logActivity("Banned_user", userId);
-    // }
+    @Before("execution(* com.toan.spring.project.services.UserService.changeUserRoleToBanned(..)) && args(userId)")
+    public void logUserBanned(long userId) {
+        logActivity("BANNED_USER", userId);
+    }
 
     public void logActivity(String activity, Long bookId) {
         BookActivityLog activityLog = new BookActivityLog();
         activityLog.setActivity(activity);
-        activityLog.setBookId(bookId);
+        activityLog.setBookUserId(bookId);
         activityLog.setTimestamp(LocalDateTime.now());
         bookActivityLogRepository.save(activityLog);
     }

@@ -31,12 +31,6 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    // lấy tổng role trong db
-    @GetMapping("/gettotalroles")
-    public long getTotalRoles() {
-        return roleRepository.count();
-    }
-
     @GetMapping("/rolelist")
     public List<Role> getAllRoles() {
         return roleService.getAllRoles();
