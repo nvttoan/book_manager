@@ -27,9 +27,10 @@ import com.toan.spring.project.security.services.UserDetailsServiceImpl;
 public class WebSecurityConfig {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
+
   // dung entrypoint xu ly exception
   @Autowired
-  private AuthEntryPointJwt unauthorizedHandler;
+  // private AuthEntryPointJwt unauthorizedHandler;
 
   // gọi lại lớp filter xác thực token jwt
   @Bean
@@ -62,7 +63,8 @@ public class WebSecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
-        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+        // .exceptionHandling(exception ->
+        // exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/allbooks/**").permitAll()

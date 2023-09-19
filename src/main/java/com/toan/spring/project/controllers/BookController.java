@@ -80,7 +80,7 @@ public class BookController {
     }
 
     // sắp xếp
-    @GetMapping("/user/sort")
+    @GetMapping("/user/sortbook")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<Book> getAllBooksSortedByTitle() {
         return bookService.getAllBooksSortedByTitle();

@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,19 +26,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toan.spring.project.dto.LoginResponseDto;
+import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.request.LoginRequest;
 import com.toan.spring.project.payload.request.SignupRequest;
 import com.toan.spring.project.payload.response.MessageResponse;
+import com.toan.spring.project.payload.response.RegisterResponse;
 import com.toan.spring.project.payload.response.UserInfoResponse;
 import com.toan.spring.project.repository.RoleRepository;
 import com.toan.spring.project.repository.UserRepository;
 import com.toan.spring.project.security.jwt.JwtUtils;
 import com.toan.spring.project.security.services.UserDetailsImpl;
 
-//for Angular Client (withCredentials)
-//@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
+import io.micrometer.common.util.StringUtils;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -56,7 +59,7 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
-  @PostMapping("/signin")
+  @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
     try {
       Authentication authentication = authenticationManager
@@ -88,19 +91,22 @@ public class AuthController {
     }
   }
 
-  @PostMapping("/signup")
+  @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-    try {// validate
+    try {
+      if (StringUtils.isBlank(signUpRequest.getUsername()) || StringUtils.isBlank(signUpRequest.getEmail())
+          || StringUtils.isBlank(signUpRequest.getPassword())) {
+        return ResponseEntity.badRequest().body(new RegisterResponse(1, "Thiếu thông tin đăng kí"));
+      }
+      // validate
       if (containsUpperCase(signUpRequest.getUsername()) || containsSpecialCharacters(signUpRequest.getPassword())) {
-        return ResponseEntity.badRequest().body(new MessageResponse(
-            "Error: Username và password không viết hoa hoặc chứa kí tự đặc biệt"));
+        return ResponseEntity.badRequest().body(new RegisterResponse(2, "Username và password không hợp lệ"));
       }
       if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-        return ResponseEntity.badRequest().body(new MessageResponse("Error: Username đã được sử dụng"));
+        return ResponseEntity.badRequest().body(new RegisterResponse(3, "Username đã được sử dụng"));
       }
-
       if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-        return ResponseEntity.badRequest().body(new MessageResponse("Error: Email đã được sử dụng"));
+        return ResponseEntity.badRequest().body(new RegisterResponse(4, "Email đã được sử dụng"));
       }
 
       // Create new user's account
@@ -122,7 +128,6 @@ public class AuthController {
               Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                   .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
               roles.add(adminRole);
-
               break;
             default:
               Role userRole = roleRepository.findByName("ROLE_USER")
@@ -135,14 +140,13 @@ public class AuthController {
       user.setRoles(roles);
       userRepository.save(user);
 
-      return ResponseEntity.ok(new MessageResponse("Đăng kí thành công"));
+      return ResponseEntity.ok(new RegisterResponse(0, "Đăng ký thành công"));
     } catch (Exception e) {
-      return ResponseEntity.ok(new MessageResponse("Đăng kí thất bại"));
+      return ResponseEntity.ok(new RegisterResponse(5, "Đăng ký thất bại"));
     }
-
   }
 
-  @PostMapping("/signout")
+  @PostMapping("/logout")
   public ResponseEntity<?> logoutUser() {
     try {
       ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
