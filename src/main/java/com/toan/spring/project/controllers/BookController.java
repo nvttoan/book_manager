@@ -3,15 +3,18 @@ package com.toan.spring.project.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.models.Book;
-import com.toan.spring.project.payload.response.MessageResponse;
+import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
+
+import io.micrometer.common.util.StringUtils;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,21 +22,32 @@ import org.springframework.web.bind.annotation.*;
 public class BookController {
     @Autowired
     private BookService bookService;
+    @Autowired
+    private BookRepository bookRepository;
 
     @RequestMapping(value = { "/allbooks" }, method = RequestMethod.GET)
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public ResponseEntity<Object> getAllBooks() {
+        try {
+            List<Book> logs = bookService.getAllBooks();
+            return ResponseEntity.ok(logs); // Trả về danh sách log nếu thành công.
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/admin/addbook")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addBook(@RequestBody Book book) {
         try {
+            if (StringUtils.isBlank(book.getTitle()) || StringUtils.isBlank(book.getAuthor())
+                    || StringUtils.isBlank(book.getCode()) || (book.getStatus()) == null) {
+                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin sách"));
+            }
             return ResponseEntity.ok(bookService.addNewBook(book));
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền thêm sách"));
         } catch (Exception e) {
-            return ResponseEntity.ok(new MessageResponse("Error: Có lỗi"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -41,26 +55,31 @@ public class BookController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateBook(@RequestBody Book book) {
         try {
+            if (StringUtils.isBlank(book.getTitle()) || StringUtils.isBlank(book.getAuthor())
+                    || StringUtils.isBlank(book.getCode()) || (book.getStatus()) == null) {
+                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin sách"));
+            }
             return ResponseEntity.ok(bookService.editBook(book));
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền sửa sách"));
         } catch (Exception e) {
-            return ResponseEntity.ok(new MessageResponse("Error: Có lỗi"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
 
     // xem lại
-    @DeleteMapping("/admin/deletebook")
+    @DeleteMapping("/admin/deletebook/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteBook(@RequestBody Book book) {
+    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
         try {
-            bookService.deleteBook(book);
-            return ResponseEntity.ok("Successfully Deleted");
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Bạn không có quyền xóa sách"));
+            if (!bookRepository.existsById(id)) {
+                return ResponseEntity.badRequest().body(new CodeResponse(1, "Sách không tồn tại"));
+            }
+            bookService.deleteBook(id);
+            return ResponseEntity.badRequest().body(new CodeResponse(0, "Xóa sách thành công"));
         } catch (Exception e) {
-            return ResponseEntity.ok(new MessageResponse("Error: Có lỗi khi xóa"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
@@ -68,21 +87,37 @@ public class BookController {
     // find
     @GetMapping("/user/findbook")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<Book> findBooks(
+    public ResponseEntity<?> findBooks(
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "author", required = false) String author,
             @RequestParam(name = "code", required = false) String code,
             @RequestParam(name = "status", required = false) BookStatus status) {
 
-        List<Book> books = bookService.findBooks(title, author, code, status);
+        try {
+            List<Book> books = bookService.findBooks(title, author, code, status);
 
-        return books;
+            if (books.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new CodeResponse(1, "Không có sách nào được tìm thấy."));
+            } else {
+                return ResponseEntity.ok(books);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 
     // sắp xếp
     @GetMapping("/user/sortbook")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<Book> getAllBooksSortedByTitle() {
-        return bookService.getAllBooksSortedByTitle();
+    public ResponseEntity<?> getAllBooksSortedByTitle() {
+        try {
+            List<Book> books = bookService.getAllBooksSortedByTitle();
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 }

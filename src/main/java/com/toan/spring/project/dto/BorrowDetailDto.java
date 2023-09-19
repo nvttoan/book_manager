@@ -10,7 +10,7 @@ import com.toan.spring.project.models.BorrowingDetail;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BorrowingDetailDto {
+public class BorrowDetailDto {
     private String book;
     private String author;
 
@@ -20,7 +20,7 @@ public class BorrowingDetailDto {
     private long penaltyMoney;
 
     // constructor tạo dto từ detail
-    public BorrowingDetailDto(BorrowingDetail borrowingDetail) {
+    public BorrowDetailDto(BorrowingDetail borrowingDetail) {
         this.book = borrowingDetail.getBook().getTitle();
         this.author = borrowingDetail.getBook().getAuthor();
         this.username = borrowingDetail.getUser().getName();

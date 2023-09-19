@@ -16,8 +16,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toan.spring.project.payload.response.CodeResponse;
 
-//lỗi 401
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
@@ -29,16 +29,13 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     logger.error("Unauthorized error: {}", authException.getMessage());
 
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-    final Map<String, Object> body = new HashMap<>();
-    body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-    body.put("error", "Unauthorized");
-    body.put("message", authException.getMessage());
-    body.put("path", request.getServletPath());
+    final CodeResponse codeResponse = new CodeResponse(HttpServletResponse.SC_FORBIDDEN,
+        "Forbidden: bạn không có quyền truy cập");
 
     final ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
+    mapper.writeValue(response.getOutputStream(), codeResponse);
   }
 
 }

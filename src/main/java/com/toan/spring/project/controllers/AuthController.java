@@ -12,28 +12,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toan.spring.project.dto.LoginResponseDto;
-import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.request.LoginRequest;
 import com.toan.spring.project.payload.request.SignupRequest;
-import com.toan.spring.project.payload.response.MessageResponse;
-import com.toan.spring.project.payload.response.RegisterResponse;
-import com.toan.spring.project.payload.response.UserInfoResponse;
+import com.toan.spring.project.payload.response.CodeResponse;
 import com.toan.spring.project.repository.RoleRepository;
 import com.toan.spring.project.repository.UserRepository;
 import com.toan.spring.project.security.jwt.JwtUtils;
@@ -62,6 +56,13 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
     try {
+      if (StringUtils.isBlank(loginRequest.getUsername())
+          || StringUtils.isBlank(loginRequest.getPassword())) {
+        return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin đăng nhập"));
+      }
+      if (containsUpperCase(loginRequest.getUsername()) || containsSpecialCharacters(loginRequest.getPassword())) {
+        return ResponseEntity.badRequest().body(new CodeResponse(2, "Username và password không hợp lệ"));
+      }
       Authentication authentication = authenticationManager
           .authenticate(
               new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -77,17 +78,16 @@ public class AuthController {
           .collect(Collectors.toList());
 
       // gắn jwt vào header
-      LoginResponseDto response = new LoginResponseDto("Đăng nhập thành công với thông tin sau:", new UserInfoResponse(
-          userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getName(), roles));
-
+      CodeResponse response = new CodeResponse(0, "Đăng nhập thành công");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
           .body(response);
     } catch (BadCredentialsException e) {
       // 401
-      return ResponseEntity.ok(new MessageResponse("Error: Sai username hoặc password"));
+      return ResponseEntity.ok(new CodeResponse(3, "Error: Sai username hoặc password"));
     } catch (Exception e) {
-      return ResponseEntity.ok(new MessageResponse("Error: Đăng nhập thất bại"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
     }
   }
 
@@ -95,18 +95,18 @@ public class AuthController {
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
     try {
       if (StringUtils.isBlank(signUpRequest.getUsername()) || StringUtils.isBlank(signUpRequest.getEmail())
-          || StringUtils.isBlank(signUpRequest.getPassword())) {
-        return ResponseEntity.badRequest().body(new RegisterResponse(1, "Thiếu thông tin đăng kí"));
+          || StringUtils.isBlank(signUpRequest.getPassword()) || StringUtils.isBlank(signUpRequest.getName())) {
+        return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin đăng kí"));
       }
       // validate
       if (containsUpperCase(signUpRequest.getUsername()) || containsSpecialCharacters(signUpRequest.getPassword())) {
-        return ResponseEntity.badRequest().body(new RegisterResponse(2, "Username và password không hợp lệ"));
+        return ResponseEntity.badRequest().body(new CodeResponse(2, "Username và password không hợp lệ"));
       }
       if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-        return ResponseEntity.badRequest().body(new RegisterResponse(3, "Username đã được sử dụng"));
+        return ResponseEntity.badRequest().body(new CodeResponse(3, "Username đã được sử dụng"));
       }
       if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-        return ResponseEntity.badRequest().body(new RegisterResponse(4, "Email đã được sử dụng"));
+        return ResponseEntity.badRequest().body(new CodeResponse(4, "Email đã được sử dụng"));
       }
 
       // Create new user's account
@@ -140,9 +140,10 @@ public class AuthController {
       user.setRoles(roles);
       userRepository.save(user);
 
-      return ResponseEntity.ok(new RegisterResponse(0, "Đăng ký thành công"));
+      return ResponseEntity.ok(new CodeResponse(0, "Đăng ký thành công"));
     } catch (Exception e) {
-      return ResponseEntity.ok(new RegisterResponse(5, "Đăng ký thất bại"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
     }
   }
 
@@ -151,9 +152,10 @@ public class AuthController {
     try {
       ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
       return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-          .body(new MessageResponse("Bạn đã đăng xuất!"));
+          .body(new CodeResponse(0, "Bạn đã đăng xuất!"));
     } catch (Exception e) {
-      return ResponseEntity.ok(new MessageResponse("Error: Đăng xuất thất bại"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
     }
 
   }

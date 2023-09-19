@@ -1,19 +1,18 @@
 package com.toan.spring.project.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.toan.spring.project.models.Role;
+
 import com.toan.spring.project.models.User;
-import com.toan.spring.project.payload.response.MessageResponse;
+import com.toan.spring.project.payload.response.CodeResponse;
 import com.toan.spring.project.services.UserService;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -27,38 +26,60 @@ public class UserController {
     }
 
     @GetMapping("/user/all")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<User> getAllUsers() {
-        return userService.getAllUser();
+    @PreAuthorize(" hasRole('ADMIN')")
+    public ResponseEntity<Object> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUser();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 
-    @PostMapping("/user")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
-    }
+    // @PostMapping("/user")
+    // @PreAuthorize(" hasRole('ADMIN')")
+    // public User createUser(@RequestBody User user) {
+    // return userService.createUser(user);
+    // }
 
     @GetMapping("/user/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        try {
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/user/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User userDetails) {
-        User user = userService.updateUser(id, userDetails);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User userDetails) {
+        try {
+            User user = userService.updateUser(id, userDetails);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/user/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable long id) {
-        userService.deleteUser(id);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("delete", Boolean.TRUE);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+        try {
+            userService.deleteUser(id);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("delete", Boolean.TRUE);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
+
     }
 
     @PutMapping("/user/banned/{id}")
@@ -69,17 +90,23 @@ public class UserController {
 
             return ResponseEntity.ok("Đã cấm người dùng thành công.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Cấm người dùng thất bại"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
 
     @GetMapping("/user/role/{roleId}")
-    @PreAuthorize("hasRole('ADMIN')") // Yêu cầu quyền ADMIN để xem danh sách người dùng có role_id
-    public List<User> getUsersByRoleId(@PathVariable long roleId) {
-        List<User> users = userService.getUsersByRoleId(roleId);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getUsersByRoleId(@PathVariable long roleId) {
+        try {
+            List<User> users = userService.getUsersByRoleId(roleId);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+        }
 
-        return users;
     }
 
 }

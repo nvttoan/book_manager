@@ -12,6 +12,7 @@ import com.toan.spring.project.aspects.BookActivityLoggingAspect;
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
+import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
 
@@ -42,7 +43,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteBook(Book book) {
+    public void deleteBook(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("book not delete with id:" + id));
         bookRepository.delete(book);
     }
 

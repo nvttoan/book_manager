@@ -12,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
+    boolean existsById(Long id);
+
     public Optional<Book> findByIdAndStatus(Long id, BookStatus status);
 
     public List<Book> findByTitleContainingOrAuthorContainingOrCodeOrStatus(String title, String author, String code,

@@ -3,15 +3,14 @@ package com.toan.spring.project.services.impl;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.common.BorrowStatus;
 import com.toan.spring.project.common.ReaderAction;
-import com.toan.spring.project.dto.BorrowingDetailDto;
-import com.toan.spring.project.dto.CheckoutDetailDto;
+import com.toan.spring.project.dto.BorrowDetailDto;
+import com.toan.spring.project.dto.ReturnDetailDto;
 import com.toan.spring.project.dto.ReaderActionDetailDto;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
@@ -95,7 +94,7 @@ public class BorrowingDetailServiceImpl implements BorrowingDetailService {
 
     // borrow
     @Override
-    public BorrowingDetailDto borrowBook(Long userid, Long bookid, long expectedReturn) {
+    public BorrowDetailDto borrowBook(Long userid, Long bookid, long expectedReturn) {
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new ResourceNotFoundException("Unavailable user"));
         Book book = bookService.findById(bookid);
@@ -104,22 +103,14 @@ public class BorrowingDetailServiceImpl implements BorrowingDetailService {
             book.setStatus(BookStatus.NOT_AVAILABLE);
             bookService.save(book);
         }
-        return new BorrowingDetailDto(borrowingDetail);
+        return new BorrowDetailDto(borrowingDetail);
     }
 
     // return
     @Override
-    public CheckoutDetailDto returnBook(Long userid, Long bookid) {
+    public ReturnDetailDto returnBook(Long userid, Long bookid) {
         BorrowingDetail borrowingDetail = this.checkOutBorrowDetail(userid, bookid);
-        return new CheckoutDetailDto(borrowingDetail, System.currentTimeMillis());
-    }
-
-    private void doLongRunningTask() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return new ReturnDetailDto(borrowingDetail, System.currentTimeMillis());
     }
 
     @Override

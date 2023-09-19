@@ -15,7 +15,7 @@ public interface BookService {
 
     public Book findByIdAndStatus(Long id, BookStatus status);
 
-    public void deleteBook(Book book);
+    public void deleteBook(Long id);
 
     public Book addNewBook(Book book);
 

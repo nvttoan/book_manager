@@ -10,8 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.toan.spring.project.common.BookStatus;
-import com.toan.spring.project.dto.BorrowingDetailDto;
-import com.toan.spring.project.dto.CheckoutDetailDto;
+import com.toan.spring.project.dto.BorrowDetailDto;
+import com.toan.spring.project.dto.ReturnDetailDto;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.BorrowingDetail;

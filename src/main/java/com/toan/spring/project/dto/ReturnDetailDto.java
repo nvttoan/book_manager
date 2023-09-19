@@ -13,7 +13,7 @@ import com.toan.spring.project.models.BorrowingDetail;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckoutDetailDto {
+public class ReturnDetailDto {
     private String book;
     private String author;
     private String username;
@@ -24,7 +24,7 @@ public class CheckoutDetailDto {
     private long penaltyTime;
     private int penaltyMoney;
 
-    public CheckoutDetailDto(BorrowingDetail borrowingDetail, long returnTime) {
+    public ReturnDetailDto(BorrowingDetail borrowingDetail, long returnTime) {
         this.book = borrowingDetail.getBook().getTitle();
         this.author = borrowingDetail.getBook().getAuthor();
         this.username = borrowingDetail.getUser().getUsername();
