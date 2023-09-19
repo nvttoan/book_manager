@@ -20,7 +20,7 @@ import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.RoleRepository;
 import com.toan.spring.project.repository.UserRepository;
 import com.toan.spring.project.services.BookService;
-import com.toan.spring.project.services.BorrowingDetailService;
+import com.toan.spring.project.services.BorrowDetailService;
 import com.toan.spring.project.services.UserService;
 
 @Service

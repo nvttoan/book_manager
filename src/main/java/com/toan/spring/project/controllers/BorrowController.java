@@ -16,13 +16,13 @@ import com.toan.spring.project.dto.BorrowDetailDto;
 import com.toan.spring.project.dto.ReturnDetailDto;
 import com.toan.spring.project.dto.ReaderActionDetailDto;
 import com.toan.spring.project.payload.response.CodeResponse;
-import com.toan.spring.project.services.BorrowingDetailService;
+import com.toan.spring.project.services.BorrowDetailService;
 
 @RestController
 @RequestMapping("/api")
 public class BorrowController {
     @Autowired
-    private BorrowingDetailService borrowingDetailService;
+    private BorrowDetailService borrowingDetailService;
 
     // 7 ngày trả sách
     @PostMapping("/user/borrow")

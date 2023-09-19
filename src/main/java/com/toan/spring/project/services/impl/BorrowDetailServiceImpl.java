@@ -16,17 +16,17 @@ import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.BorrowingDetail;
 import com.toan.spring.project.models.User;
-import com.toan.spring.project.repository.BorrowingDetailRepository;
+import com.toan.spring.project.repository.BorrowDetailRepository;
 import com.toan.spring.project.repository.UserRepository;
 import com.toan.spring.project.services.BookService;
-import com.toan.spring.project.services.BorrowingDetailService;
+import com.toan.spring.project.services.BorrowDetailService;
 
 @Service
 @EnableCaching
 
-public class BorrowingDetailServiceImpl implements BorrowingDetailService {
+public class BorrowDetailServiceImpl implements BorrowDetailService {
     @Autowired
-    private BorrowingDetailRepository borrowingDetailRepository;
+    private BorrowDetailRepository borrowingDetailRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired

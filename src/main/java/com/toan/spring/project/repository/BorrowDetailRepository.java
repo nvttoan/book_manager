@@ -9,7 +9,7 @@ import com.toan.spring.project.common.BorrowStatus;
 import com.toan.spring.project.models.BorrowingDetail;
 
 @Repository
-public interface BorrowingDetailRepository extends JpaRepository<BorrowingDetail, Long> {
+public interface BorrowDetailRepository extends JpaRepository<BorrowingDetail, Long> {
     public Optional<BorrowingDetail> findByUserIdAndBookIdAndStatus(Long userid, Long bookid, BorrowStatus status);
 
     public Optional<BorrowingDetail> findFirstByBookIdAndStatusOrderByBorrowTimeDesc(Long bookid,

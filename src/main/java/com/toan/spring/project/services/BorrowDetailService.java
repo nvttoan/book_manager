@@ -9,7 +9,7 @@ import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.BorrowingDetail;
 import com.toan.spring.project.models.User;
 
-public interface BorrowingDetailService {
+public interface BorrowDetailService {
     public BorrowingDetail createNewBorrowDetail(User userid, Book bookid, long expectedReturn);
 
     public BorrowingDetail checkOutBorrowDetail(Long userid, Long bookid);
