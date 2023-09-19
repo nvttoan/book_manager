@@ -1,30 +1,9 @@
 package com.toan.spring.project.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.toan.spring.project.common.BookStatus;
-import com.toan.spring.project.dto.BorrowDetailDto;
-import com.toan.spring.project.dto.ReturnDetailDto;
-import com.toan.spring.project.exception.ResourceNotFoundException;
-import com.toan.spring.project.models.Book;
-import com.toan.spring.project.models.BorrowingDetail;
-import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
-import com.toan.spring.project.repository.RoleRepository;
-import com.toan.spring.project.repository.UserRepository;
-
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @EnableCaching

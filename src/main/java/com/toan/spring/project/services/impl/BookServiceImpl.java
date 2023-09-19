@@ -12,7 +12,6 @@ import com.toan.spring.project.aspects.BookActivityLoggingAspect;
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
-import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
 

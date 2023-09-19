@@ -8,19 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.toan.spring.project.common.BookStatus;
-import com.toan.spring.project.dto.BorrowDetailDto;
-import com.toan.spring.project.dto.ReturnDetailDto;
 import com.toan.spring.project.exception.ResourceNotFoundException;
-import com.toan.spring.project.models.Book;
-import com.toan.spring.project.models.BorrowingDetail;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.RoleRepository;
 import com.toan.spring.project.repository.UserRepository;
-import com.toan.spring.project.services.BookService;
-import com.toan.spring.project.services.BorrowDetailService;
 import com.toan.spring.project.services.UserService;
 
 @Service

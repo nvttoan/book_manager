@@ -3,9 +3,7 @@ package com.toan.spring.project.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
 import com.toan.spring.project.exception.ResourceNotFoundException;
@@ -16,11 +14,6 @@ import com.toan.spring.project.repository.RoleRepository;
 public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
-    public RoleService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
 
     public List<Role> getAllRoles() {
         return roleRepository.findAll();

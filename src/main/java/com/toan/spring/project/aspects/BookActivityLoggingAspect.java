@@ -4,12 +4,10 @@ import java.time.LocalDateTime;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.BookActivityLog;
-import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.BookActivityLogRepository;
 
 @Aspect
@@ -17,7 +15,6 @@ import com.toan.spring.project.repository.BookActivityLogRepository;
 public class BookActivityLoggingAspect {
     private final BookActivityLogRepository bookActivityLogRepository;
 
-    @Autowired
     public BookActivityLoggingAspect(BookActivityLogRepository bookActivityLogRepository) {
         this.bookActivityLogRepository = bookActivityLogRepository;
     }
