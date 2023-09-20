@@ -30,7 +30,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
     final CodeResponse codeResponse = new CodeResponse(HttpServletResponse.SC_FORBIDDEN,
-        "Forbidden: bạn không có quyền truy cập");
+        "Forbidden: bạn không có quyền");
 
     final ObjectMapper mapper = new ObjectMapper();
     mapper.writeValue(response.getOutputStream(), codeResponse);

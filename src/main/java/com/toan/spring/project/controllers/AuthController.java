@@ -84,10 +84,10 @@ public class AuthController {
           .body(response);
     } catch (BadCredentialsException e) {
       // 401
-      return ResponseEntity.ok(new CodeResponse(3, "Error: Sai username hoặc password"));
+      return ResponseEntity.ok(new CodeResponse(3, "Sai username hoặc password"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+          .body(new CodeResponse(4, "Thực hiện thất bại: " + e.getMessage()));
     }
   }
 
@@ -143,7 +143,7 @@ public class AuthController {
       return ResponseEntity.ok(new CodeResponse(0, "Đăng ký thành công"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+          .body(new CodeResponse(5, "Thực hiện thất bại: " + e.getMessage()));
     }
   }
 

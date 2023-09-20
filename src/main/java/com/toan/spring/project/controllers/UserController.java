@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.payload.response.ObjectResponse;
 import com.toan.spring.project.services.UserService;
+
+import io.micrometer.common.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +33,7 @@ public class UserController {
     public ResponseEntity<Object> getAllUsers() {
         try {
             List<User> users = userService.getAllUser();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(new ObjectResponse(0, users));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
@@ -59,11 +62,16 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User userDetails) {
         try {
+            if (StringUtils.isBlank(userDetails.getUsername()) || StringUtils.isBlank(userDetails.getEmail())
+                    || StringUtils.isBlank(userDetails.getName()) || (userDetails.getPassword()) == null
+                    || (userDetails.getRoles()) == null) {
+                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin người dùng"));
+            }
             User user = userService.updateUser(id, userDetails);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(new ObjectResponse(0, user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -88,7 +96,7 @@ public class UserController {
         try {
             userService.changeUserRoleToBanned(id);
 
-            return ResponseEntity.ok("Đã cấm người dùng thành công.");
+            return ResponseEntity.ok(new CodeResponse(0, "Cấm người dùng thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
@@ -101,7 +109,7 @@ public class UserController {
     public ResponseEntity<?> getUsersByRoleId(@PathVariable long roleId) {
         try {
             List<User> users = userService.getUsersByRoleId(roleId);
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(new ObjectResponse(0, users));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));

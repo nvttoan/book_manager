@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toan.spring.project.models.BookActivityLog;
 import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.payload.response.ObjectResponse;
 import com.toan.spring.project.services.BookActivityLogService;
 
 @RestController
@@ -25,10 +26,10 @@ public class BookActivityLogController {
     public ResponseEntity<Object> getAllLog() {
         try {
             List<BookActivityLog> logs = bookActivityLogService.getAllBookLog();
-            return ResponseEntity.ok(logs); // Trả về danh sách log nếu thành công.
+            return ResponseEntity.ok(new ObjectResponse(0, logs));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 }
