@@ -14,7 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.payload.response.StringResponse;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
@@ -29,7 +29,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-    final CodeResponse codeResponse = new CodeResponse(HttpServletResponse.SC_FORBIDDEN,
+    final StringResponse codeResponse = new StringResponse(HttpServletResponse.SC_FORBIDDEN,
         "Forbidden: bạn không có quyền");
 
     final ObjectMapper mapper = new ObjectMapper();

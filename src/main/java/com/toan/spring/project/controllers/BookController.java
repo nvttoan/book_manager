@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.toan.spring.project.common.BookStatus;
 import com.toan.spring.project.models.Book;
-import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.payload.response.StringResponse;
 import com.toan.spring.project.payload.response.ObjectResponse;
 import com.toan.spring.project.repository.BookRepository;
 import com.toan.spring.project.services.BookService;
@@ -33,7 +33,7 @@ public class BookController {
             return ResponseEntity.ok(new ObjectResponse(0, books));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -43,13 +43,13 @@ public class BookController {
         try {
             if (StringUtils.isBlank(book.getTitle()) || StringUtils.isBlank(book.getAuthor())
                     || StringUtils.isBlank(book.getCode()) || (book.getStatus()) == null) {
-                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin sách"));
+                return ResponseEntity.badRequest().body(new StringResponse(1, "Thiếu thông tin sách"));
             }
             bookService.addNewBook(book);
-            return ResponseEntity.ok(new CodeResponse(0, "Thêm sách thành công"));
+            return ResponseEntity.ok(new StringResponse(0, "Thêm sách thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -59,13 +59,13 @@ public class BookController {
         try {
             if (StringUtils.isBlank(book.getTitle()) || StringUtils.isBlank(book.getAuthor())
                     || StringUtils.isBlank(book.getCode()) || (book.getStatus()) == null) {
-                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin sách"));
+                return ResponseEntity.badRequest().body(new StringResponse(1, "Thiếu thông tin sách"));
             }
             bookService.editBook(book);
-            return ResponseEntity.ok(new CodeResponse(0, "Sửa sách thành công"));
+            return ResponseEntity.ok(new StringResponse(0, "Sửa sách thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
@@ -75,13 +75,13 @@ public class BookController {
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
         try {
             if (!bookRepository.existsById(id)) {
-                return ResponseEntity.badRequest().body(new CodeResponse(1, "Sách không tồn tại"));
+                return ResponseEntity.badRequest().body(new StringResponse(1, "Sách không tồn tại"));
             }
             bookService.deleteBook(id);
-            return ResponseEntity.badRequest().body(new CodeResponse(0, "Xóa sách thành công"));
+            return ResponseEntity.badRequest().body(new StringResponse(0, "Xóa sách thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
@@ -100,13 +100,13 @@ public class BookController {
 
             if (books.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new CodeResponse(1, "Không có sách nào được tìm thấy."));
+                        .body(new StringResponse(1, "Không có sách nào được tìm thấy."));
             } else {
                 return ResponseEntity.ok(new ObjectResponse(0, books));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -119,7 +119,7 @@ public class BookController {
             return ResponseEntity.ok(new ObjectResponse(0, books));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 }

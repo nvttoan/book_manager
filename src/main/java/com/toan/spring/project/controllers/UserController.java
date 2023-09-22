@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.toan.spring.project.models.User;
-import com.toan.spring.project.payload.response.CodeResponse;
+import com.toan.spring.project.payload.response.StringResponse;
 import com.toan.spring.project.payload.response.ObjectResponse;
 import com.toan.spring.project.services.UserService;
 
@@ -36,7 +36,7 @@ public class UserController {
             return ResponseEntity.ok(new ObjectResponse(0, users));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -54,7 +54,7 @@ public class UserController {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -65,13 +65,13 @@ public class UserController {
             if (StringUtils.isBlank(userDetails.getUsername()) || StringUtils.isBlank(userDetails.getEmail())
                     || StringUtils.isBlank(userDetails.getName()) || (userDetails.getPassword()) == null
                     || (userDetails.getRoles()) == null) {
-                return ResponseEntity.badRequest().body(new CodeResponse(1, "Thiếu thông tin người dùng"));
+                return ResponseEntity.badRequest().body(new StringResponse(1, "Thiếu thông tin người dùng"));
             }
             User user = userService.updateUser(id, userDetails);
             return ResponseEntity.ok(new ObjectResponse(0, user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(2, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(2, "Thực hiện thất bại: " + e.getMessage()));
         }
     }
 
@@ -85,7 +85,7 @@ public class UserController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
@@ -96,10 +96,10 @@ public class UserController {
         try {
             userService.changeUserRoleToBanned(id);
 
-            return ResponseEntity.ok(new CodeResponse(0, "Cấm người dùng thành công"));
+            return ResponseEntity.ok(new StringResponse(0, "Cấm người dùng thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
@@ -112,7 +112,7 @@ public class UserController {
             return ResponseEntity.ok(new ObjectResponse(0, users));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CodeResponse(1, "Thực hiện thất bại: " + e.getMessage()));
+                    .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
         }
 
     }
