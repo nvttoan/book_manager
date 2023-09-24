@@ -3,7 +3,7 @@ package com.toan.spring.project.dto;
 import java.util.Date;
 
 import com.toan.spring.project.common.ReaderAction;
-import com.toan.spring.project.models.BorrowingDetail;
+import com.toan.spring.project.models.BorrowDetail;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class ReaderActionDetailDto {
     private String user;
     private String name;
 
-    public ReaderActionDetailDto(BorrowingDetail detail, ReaderAction readerAction) {
+    public ReaderActionDetailDto(BorrowDetail detail, ReaderAction readerAction) {
         this.readerAction = readerAction;
         if (readerAction == ReaderAction.BORROW) {
             this.time = new Date(detail.getBorrowTime());

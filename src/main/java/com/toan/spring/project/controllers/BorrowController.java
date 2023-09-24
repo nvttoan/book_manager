@@ -23,7 +23,7 @@ import com.toan.spring.project.services.BorrowDetailService;
 @RequestMapping("/api")
 public class BorrowController {
     @Autowired
-    private BorrowDetailService borrowingDetailService;
+    private BorrowDetailService borrowDetailService;
 
     // 7 ngày trả sách
     @PostMapping("/user/borrow")
@@ -34,9 +34,9 @@ public class BorrowController {
             if (userid == null || bookid == null) {
                 return ResponseEntity.badRequest().body(new ObjectResponse(1, "Thiếu id của sách hoặc user"));
             }
-            BorrowDetailDto borrowingDetailDto = borrowingDetailService.borrowBook(userid, bookid,
+            BorrowDetailDto borrowDetailDto = borrowDetailService.borrowBook(userid, bookid,
                     System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000));
-            return ResponseEntity.ok(new ObjectResponse(0, borrowingDetailDto));
+            return ResponseEntity.ok(new ObjectResponse(0, borrowDetailDto));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -49,7 +49,7 @@ public class BorrowController {
     public ResponseEntity<?> returnBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
         try {
-            ReturnDetailDto checkoutDetailDto = borrowingDetailService.returnBook(userid, bookid);
+            ReturnDetailDto checkoutDetailDto = borrowDetailService.returnBook(userid, bookid);
             return ResponseEntity.ok(new ObjectResponse(0, checkoutDetailDto));
 
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public class BorrowController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> readerActionDetails() {
         try {
-            List<ReaderActionDetailDto> borrowingDetailDtos = borrowingDetailService.readerActionDetails();
+            List<ReaderActionDetailDto> borrowingDetailDtos = borrowDetailService.readerActionDetails();
             return ResponseEntity.ok(new ObjectResponse(0, borrowingDetailDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

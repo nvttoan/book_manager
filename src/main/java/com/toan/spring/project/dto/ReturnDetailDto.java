@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-import com.toan.spring.project.models.BorrowingDetail;
+import com.toan.spring.project.models.BorrowDetail;
 
 @Builder
 @Data
@@ -24,7 +24,7 @@ public class ReturnDetailDto {
     private long penaltyTime;
     private int penaltyMoney;
 
-    public ReturnDetailDto(BorrowingDetail borrowingDetail, long returnTime) {
+    public ReturnDetailDto(BorrowDetail borrowingDetail, long returnTime) {
         this.book = borrowingDetail.getBook().getTitle();
         this.author = borrowingDetail.getBook().getAuthor();
         this.username = borrowingDetail.getUser().getUsername();

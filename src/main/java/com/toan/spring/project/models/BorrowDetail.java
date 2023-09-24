@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BorrowingDetail {
+public class BorrowDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

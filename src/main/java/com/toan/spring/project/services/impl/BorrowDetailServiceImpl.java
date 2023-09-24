@@ -14,7 +14,7 @@ import com.toan.spring.project.dto.ReturnDetailDto;
 import com.toan.spring.project.dto.ReaderActionDetailDto;
 import com.toan.spring.project.exception.ResourceNotFoundException;
 import com.toan.spring.project.models.Book;
-import com.toan.spring.project.models.BorrowingDetail;
+import com.toan.spring.project.models.BorrowDetail;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.BorrowDetailRepository;
 import com.toan.spring.project.repository.UserRepository;
@@ -33,12 +33,12 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     private BookService bookService;
 
     @Override
-    public BorrowingDetail createNewBorrowDetail(User userid, Book bookid, long expectedReturn) {
+    public BorrowDetail createNewBorrowDetail(User userid, Book bookid, long expectedReturn) {
         BorrowStatus status = (bookid.getStatus() == BookStatus.NOT_AVAILABLE
                 ? BorrowStatus.IN_QUEUE
                 : BorrowStatus.BORROWING);
 
-        BorrowingDetail borrowingDetail = BorrowingDetail.builder()
+        BorrowDetail borrowingDetail = BorrowDetail.builder()
                 .book(bookid)
                 .user(userid)
                 .borrowTime(System.currentTimeMillis())
@@ -49,14 +49,14 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     }
 
     @Override
-    public BorrowingDetail checkOutBorrowDetail(Long userid, Long bookid) {
-        BorrowingDetail borrowingDetail = findBorrowingByUserIdAndBookId(userid, bookid);
+    public BorrowDetail checkOutBorrowDetail(Long userid, Long bookid) {
+        BorrowDetail borrowingDetail = findBorrowingByUserIdAndBookId(userid, bookid);
 
         long current = System.currentTimeMillis();
         long penaltyDuration = current - borrowingDetail.getExpectedReturnTime();
         borrowingDetail.setPenalty((int) (penaltyDuration > 0 ? penaltyDuration : 0) / (24 * 60 * 60 * 1000) * 1000);
         borrowingDetail.setStatus(BorrowStatus.RETURNED);
-        BorrowingDetail ret = save(borrowingDetail);
+        BorrowDetail ret = save(borrowingDetail);
 
         Book book = bookService.findByIdAndStatus(bookid, BookStatus.NOT_AVAILABLE);
         book.setStatus(BookStatus.AVAILABLE);
@@ -75,20 +75,20 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
 
     // find user đang mượn
     @Override
-    public BorrowingDetail findBorrowingByUserIdAndBookId(Long userid, Long bookid) {
+    public BorrowDetail findBorrowingByUserIdAndBookId(Long userid, Long bookid) {
         return borrowingDetailRepository.findByUserIdAndBookIdAndStatus(userid, bookid, BorrowStatus.BORROWING)
                 .orElse(null);
     }
 
     @Override
-    public BorrowingDetail findFirstInQueue(Long bookId) {
+    public BorrowDetail findFirstInQueue(Long bookId) {
         return borrowingDetailRepository
                 .findFirstByBookIdAndStatusOrderByBorrowTimeDesc(bookId, BorrowStatus.IN_QUEUE)
                 .orElse(null);
     }
 
     @Override
-    public BorrowingDetail save(BorrowingDetail borrowingDetail) {
+    public BorrowDetail save(BorrowDetail borrowingDetail) {
         return borrowingDetailRepository.save(borrowingDetail);
     }
 
@@ -98,7 +98,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new ResourceNotFoundException("Unavailable user"));
         Book book = bookService.findById(bookid);
-        BorrowingDetail borrowingDetail = this.createNewBorrowDetail(user, book, expectedReturn);
+        BorrowDetail borrowingDetail = this.createNewBorrowDetail(user, book, expectedReturn);
         if (book.getStatus() == BookStatus.AVAILABLE) {
             book.setStatus(BookStatus.NOT_AVAILABLE);
             bookService.save(book);
@@ -109,15 +109,15 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     // return
     @Override
     public ReturnDetailDto returnBook(Long userid, Long bookid) {
-        BorrowingDetail borrowingDetail = this.checkOutBorrowDetail(userid, bookid);
+        BorrowDetail borrowingDetail = this.checkOutBorrowDetail(userid, bookid);
         return new ReturnDetailDto(borrowingDetail, System.currentTimeMillis());
     }
 
     @Override
     public List<ReaderActionDetailDto> readerActionDetails() {
-        List<BorrowingDetail> borrowingDetails = borrowingDetailRepository.findAll();
+        List<BorrowDetail> borrowingDetails = borrowingDetailRepository.findAll();
         List<ReaderActionDetailDto> readerActionDetailDtos = new ArrayList<>();
-        for (BorrowingDetail borrowingDetail : borrowingDetails) {
+        for (BorrowDetail borrowingDetail : borrowingDetails) {
             if (borrowingDetail.getStatus() == BorrowStatus.RETURNED) {
                 readerActionDetailDtos.add(new ReaderActionDetailDto(borrowingDetail, ReaderAction.RETURN));
             }

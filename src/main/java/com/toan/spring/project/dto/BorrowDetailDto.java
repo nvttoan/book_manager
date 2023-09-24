@@ -4,7 +4,7 @@ import lombok.*;
 
 import java.util.Date;
 
-import com.toan.spring.project.models.BorrowingDetail;
+import com.toan.spring.project.models.BorrowDetail;
 
 @Builder
 @Data
@@ -20,7 +20,7 @@ public class BorrowDetailDto {
     private long penaltyMoney;
 
     // constructor tạo dto từ detail
-    public BorrowDetailDto(BorrowingDetail borrowingDetail) {
+    public BorrowDetailDto(BorrowDetail borrowingDetail) {
         this.book = borrowingDetail.getBook().getTitle();
         this.author = borrowingDetail.getBook().getAuthor();
         this.username = borrowingDetail.getUser().getName();
