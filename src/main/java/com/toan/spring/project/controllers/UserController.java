@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.toan.spring.project.dto.UserDetailDto;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.response.StringResponse;
 import com.toan.spring.project.payload.response.ObjectResponse;
@@ -16,6 +17,7 @@ import io.micrometer.common.util.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -33,7 +35,10 @@ public class UserController {
     public ResponseEntity<Object> getAllUsers() {
         try {
             List<User> users = userService.getAllUser();
-            return ResponseEntity.ok(new ObjectResponse(0, users));
+            List<UserDetailDto> userDetailDtos = users.stream()
+                    .map(UserDetailDto::new)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ObjectResponse(0, userDetailDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));
