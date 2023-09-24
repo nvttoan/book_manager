@@ -2,6 +2,7 @@ package com.toan.spring.project.services;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
+
 import com.toan.spring.project.models.User;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public interface UserService {
     public List<User> getAllUser();
 
     public User createUser(User user);
+
+    public User save(User user);
 
     public User getUserById(long id);
 

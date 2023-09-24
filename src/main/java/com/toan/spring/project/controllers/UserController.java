@@ -51,7 +51,7 @@ public class UserController {
     public ResponseEntity<?> getUserById(@PathVariable long id) {
         try {
             User user = userService.getUserById(id);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(new ObjectResponse(0, user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new StringResponse(1, "Thực hiện thất bại: " + e.getMessage()));

@@ -15,15 +15,23 @@ public class ReaderActionDetailDto {
     private Date time;
     private String user;
     private String name;
+    private String book;
+    private int penaltyMoney;
 
-    public ReaderActionDetailDto(BorrowDetail detail, ReaderAction readerAction) {
+    public ReaderActionDetailDto(BorrowDetail borrowDetail, ReaderAction readerAction) {
         this.readerAction = readerAction;
         if (readerAction == ReaderAction.BORROW) {
-            this.time = new Date(detail.getBorrowTime());
+            this.time = new Date(borrowDetail.getBorrowTime());
         } else {
-            this.time = new Date(detail.getExpectedReturnTime() + detail.getPenalty() * 24 * 60 * 60);
+            this.time = new Date(borrowDetail.getExpectedReturnTime() + borrowDetail.getPenalty() * 24 * 60 * 60);
         }
-        this.user = detail.getUser().getUsername();
-        this.name = detail.getUser().getName();
+        this.user = borrowDetail.getUser().getUsername();
+        this.name = borrowDetail.getUser().getName();
+        this.book = borrowDetail.getBook().getTitle();
+        if (borrowDetail.getPenalty() > 0) {
+            this.penaltyMoney = (int) borrowDetail.getPenalty();
+        } else {
+            this.penaltyMoney = 0;
+        }
     }
 }

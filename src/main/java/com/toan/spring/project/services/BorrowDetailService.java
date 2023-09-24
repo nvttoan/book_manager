@@ -10,9 +10,9 @@ import com.toan.spring.project.models.BorrowDetail;
 import com.toan.spring.project.models.User;
 
 public interface BorrowDetailService {
-    public BorrowDetail createNewBorrowDetail(User userid, Book bookid, long expectedReturn);
+    public BorrowDetail NewBorrowDetail(User userid, Book bookid, long expectedReturn);
 
-    public BorrowDetail checkOutBorrowDetail(Long userid, Long bookid);
+    public BorrowDetail ReturnDetail(Long userid, Long bookid);
 
     public BorrowDetail findBorrowingByUserIdAndBookId(Long userid, Long bookid);
 

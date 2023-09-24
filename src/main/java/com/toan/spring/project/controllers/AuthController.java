@@ -27,6 +27,7 @@ import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.payload.request.LoginRequest;
 import com.toan.spring.project.payload.request.SignupRequest;
+import com.toan.spring.project.payload.response.ObjectResponse;
 import com.toan.spring.project.payload.response.StringResponse;
 import com.toan.spring.project.repository.RoleRepository;
 import com.toan.spring.project.repository.UserRepository;
@@ -73,12 +74,12 @@ public class AuthController {
 
       ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-      List<String> roles = userDetails.getAuthorities().stream()
-          .map(item -> item.getAuthority())
-          .collect(Collectors.toList());
+      // List<String> roles = userDetails.getAuthorities().stream()
+      // .map(item -> item.getAuthority())
+      // .collect(Collectors.toList());
 
       // gắn jwt vào header
-      StringResponse response = new StringResponse(0, "Đăng nhập thành công");
+      ObjectResponse response = new ObjectResponse(0, userDetails);
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
           .body(response);

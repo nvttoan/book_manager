@@ -48,15 +48,15 @@ public class BorrowController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> returnBook(@RequestParam("userid") Long userid,
             @RequestParam("bookid") Long bookid) {
-        try {
-            ReturnDetailDto checkoutDetailDto = borrowDetailService.returnBook(userid, bookid);
-            return ResponseEntity.ok(new ObjectResponse(0, checkoutDetailDto));
+        // try {
+        ReturnDetailDto checkoutDetailDto = borrowDetailService.returnBook(userid, bookid);
+        return ResponseEntity.ok(new ObjectResponse(0, checkoutDetailDto));
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringResponse(1,
-                            "Thực hiện thất bại: Bạn chưa mượn hoặc đã trả sách " + e.getMessage()));
-        }
+        // } catch (Exception e) {
+        // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        // .body(new StringResponse(1,
+        // "Thực hiện thất bại: Bạn chưa mượn hoặc đã trả sách " + e.getMessage()));
+        // }
 
     }
 

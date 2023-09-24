@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.toan.spring.project.exception.ResourceNotFoundException;
+import com.toan.spring.project.models.Book;
 import com.toan.spring.project.models.Role;
 import com.toan.spring.project.models.User;
 import com.toan.spring.project.repository.RoleRepository;
@@ -56,8 +57,8 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new IllegalArgumentException("User must have at least one role.");
         }
-
-        return userRepository.save(user);
+        User savedUser = save(user);
+        return savedUser;
     }
 
     @Override
@@ -89,7 +90,8 @@ public class UserServiceImpl implements UserService {
             user.setRoles(updatedRoles);
         }
 
-        return userRepository.save(user);
+        User savedUser = save(user);
+        return savedUser;
     }
 
     @Override
@@ -113,4 +115,10 @@ public class UserServiceImpl implements UserService {
 
         updateUser(id, user);
     }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
 }

@@ -26,49 +26,50 @@ import com.toan.spring.project.services.BorrowDetailService;
 
 public class BorrowDetailServiceImpl implements BorrowDetailService {
     @Autowired
-    private BorrowDetailRepository borrowingDetailRepository;
+    private BorrowDetailRepository borrowDetailRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private BookService bookService;
 
     @Override
-    public BorrowDetail createNewBorrowDetail(User userid, Book bookid, long expectedReturn) {
+    public BorrowDetail NewBorrowDetail(User userid, Book bookid, long expectedReturn) {
         BorrowStatus status = (bookid.getStatus() == BookStatus.NOT_AVAILABLE
                 ? BorrowStatus.IN_QUEUE
                 : BorrowStatus.BORROWING);
 
-        BorrowDetail borrowingDetail = BorrowDetail.builder()
+        BorrowDetail borrowDetail = BorrowDetail.builder()
                 .book(bookid)
                 .user(userid)
                 .borrowTime(System.currentTimeMillis())
                 .expectedReturnTime(expectedReturn)
                 .status(status)
                 .build();
-        return borrowingDetailRepository.save(borrowingDetail);
+        return borrowDetailRepository.save(borrowDetail);
     }
 
     @Override
-    public BorrowDetail checkOutBorrowDetail(Long userid, Long bookid) {
-        BorrowDetail borrowingDetail = findBorrowingByUserIdAndBookId(userid, bookid);
+    public BorrowDetail ReturnDetail(Long userid, Long bookid) {
+        BorrowDetail borrowDetail = findBorrowingByUserIdAndBookId(userid, bookid);
 
         long current = System.currentTimeMillis();
-        long penaltyDuration = current - borrowingDetail.getExpectedReturnTime();
-        borrowingDetail.setPenalty((int) (penaltyDuration > 0 ? penaltyDuration : 0) / (24 * 60 * 60 * 1000) * 1000);
-        borrowingDetail.setStatus(BorrowStatus.RETURNED);
-        BorrowDetail ret = save(borrowingDetail);
+        long penaltyDuration = current - borrowDetail.getExpectedReturnTime();
+        borrowDetail.setPenalty((int) (penaltyDuration > 0 ? penaltyDuration : 0) / (24 * 60 * 60 * 1000) * 1000);
+        borrowDetail.setStatus(BorrowStatus.RETURNED);
+        BorrowDetail ret = save(borrowDetail);
 
         Book book = bookService.findByIdAndStatus(bookid, BookStatus.NOT_AVAILABLE);
         book.setStatus(BookStatus.AVAILABLE);
         bookService.save(book);
 
-        borrowingDetail = findFirstInQueue(bookid);
-        if (borrowingDetail != null) {
+        borrowDetail = findFirstInQueue(bookid);
+        if (borrowDetail != null) {
             book.setStatus(BookStatus.NOT_AVAILABLE);
             bookService.save(book);
-            borrowingDetail.setStatus(BorrowStatus.BORROWING);
-            borrowingDetail.setExpectedReturnTime(current + (7 * 24 * 60 * 60 * 1000));
-            save(borrowingDetail);
+            borrowDetail.setStatus(BorrowStatus.BORROWING);
+            borrowDetail.setBorrowTime(System.currentTimeMillis());
+            borrowDetail.setExpectedReturnTime(System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000));
+            save(borrowDetail);
         }
         return ret;
     }
@@ -76,20 +77,20 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     // find user đang mượn
     @Override
     public BorrowDetail findBorrowingByUserIdAndBookId(Long userid, Long bookid) {
-        return borrowingDetailRepository.findByUserIdAndBookIdAndStatus(userid, bookid, BorrowStatus.BORROWING)
+        return borrowDetailRepository.findByUserIdAndBookIdAndStatus(userid, bookid, BorrowStatus.BORROWING)
                 .orElse(null);
     }
 
     @Override
     public BorrowDetail findFirstInQueue(Long bookId) {
-        return borrowingDetailRepository
+        return borrowDetailRepository
                 .findFirstByBookIdAndStatusOrderByBorrowTimeDesc(bookId, BorrowStatus.IN_QUEUE)
                 .orElse(null);
     }
 
     @Override
-    public BorrowDetail save(BorrowDetail borrowingDetail) {
-        return borrowingDetailRepository.save(borrowingDetail);
+    public BorrowDetail save(BorrowDetail borrowDetail) {
+        return borrowDetailRepository.save(borrowDetail);
     }
 
     // borrow
@@ -98,31 +99,31 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new ResourceNotFoundException("Unavailable user"));
         Book book = bookService.findById(bookid);
-        BorrowDetail borrowingDetail = this.createNewBorrowDetail(user, book, expectedReturn);
+        BorrowDetail borrowDetail = this.NewBorrowDetail(user, book, expectedReturn);
         if (book.getStatus() == BookStatus.AVAILABLE) {
             book.setStatus(BookStatus.NOT_AVAILABLE);
             bookService.save(book);
         }
-        return new BorrowDetailDto(borrowingDetail);
+        return new BorrowDetailDto(borrowDetail);
     }
 
     // return
     @Override
     public ReturnDetailDto returnBook(Long userid, Long bookid) {
-        BorrowDetail borrowingDetail = this.checkOutBorrowDetail(userid, bookid);
-        return new ReturnDetailDto(borrowingDetail, System.currentTimeMillis());
+        BorrowDetail borrowDetail = this.ReturnDetail(userid, bookid);
+        return new ReturnDetailDto(borrowDetail, System.currentTimeMillis());
     }
 
     @Override
     public List<ReaderActionDetailDto> readerActionDetails() {
-        List<BorrowDetail> borrowingDetails = borrowingDetailRepository.findAll();
+        List<BorrowDetail> borrowDetails = borrowDetailRepository.findAll();
         List<ReaderActionDetailDto> readerActionDetailDtos = new ArrayList<>();
-        for (BorrowDetail borrowingDetail : borrowingDetails) {
-            if (borrowingDetail.getStatus() == BorrowStatus.RETURNED) {
-                readerActionDetailDtos.add(new ReaderActionDetailDto(borrowingDetail, ReaderAction.RETURN));
+        for (BorrowDetail borrowDetail : borrowDetails) {
+            if (borrowDetail.getStatus() == BorrowStatus.RETURNED) {
+                readerActionDetailDtos.add(new ReaderActionDetailDto(borrowDetail, ReaderAction.RETURN));
             }
 
-            readerActionDetailDtos.add(new ReaderActionDetailDto(borrowingDetail, ReaderAction.BORROW));
+            readerActionDetailDtos.add(new ReaderActionDetailDto(borrowDetail, ReaderAction.BORROW));
         }
         Collections.sort(readerActionDetailDtos, new Comparator<ReaderActionDetailDto>() {
             @Override
